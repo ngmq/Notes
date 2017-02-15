@@ -7,3 +7,5 @@ How IoT and machine learning can make our roads safer [https://techcrunch.com/20
 Udacity Self-driving car [http://blog.udacity.com/2016/11/artificial-intelligence-machine-learning-self-driving-cars.html]
 
 Reliable Machine Learning in the Wild - NIPS 2016 Workshop [https://sites.google.com/site/wildml2016nips/]
+
+CHCAI/MIRI research internship in AI safety [https://intelligence.org/2017/02/11/chcai-miri/]
