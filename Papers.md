@@ -10,8 +10,9 @@ Brain for Cars is a project whose mission is to anticipate the driver's behavior
 Transportation industry costs a huge amount of money every year for maintenance, repair costs, accidents and mortality. How can IoT and Machine Learning help reducing this spending? IoT provides a huge amount of data about the drivers' driving habits and condition of their cars. ML provides models to improve driving behaviors, predict disasters and detect road failures.
 
 **[CHCAI/MIRI research internship in AI safety](https://intelligence.org/2017/02/11/chcai-miri/)**
-Read first: [Concrete Problems in AI safety](https://arxiv.org/pdf/1606.06565.pdf)
+Read first: https://openai.com/blog/concrete-ai-safety-problems/ and  [Concrete Problems in AI safety](https://arxiv.org/pdf/1606.06565.pdf)
 
-**[Safe, Multi-Agent, Reinforcement Learning for Autonomous Driving](https://arxiv.org/abs/1610.03295)**
+**[Safe, Multi-Agent, Reinforcement Learning for Autonomous Driving](https://arxiv.org/abs/1610.03295)**:
+Another paper using LSTM
 
 Reliable Machine Learning in the Wild - NIPS 2016 Workshop [https://sites.google.com/site/wildml2016nips/]
