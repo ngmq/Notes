@@ -16,3 +16,7 @@ Read first: https://openai.com/blog/concrete-ai-safety-problems/ and  [Concrete 
 Another paper using LSTM
 
 Reliable Machine Learning in the Wild - NIPS 2016 Workshop [https://sites.google.com/site/wildml2016nips/]
+
+**[A practical theory for designing very deep convolutional neural networks](https://kaggle2.blob.core.windows.net/forum-message-attachments/69182/2287/A%20practical%20theory%20for%20designing%20very%20deep%20convolutional%20neural%20networks.pdf)**
+The paper proposes two principal rules for designing deep CNN that guarantee performance gain. Although it seems that the author didn't/haven't officially publish his work at any conferences, the paper is actually very interesting and worth study further. The basic idea is "we cast the task of designing deep convolutional neural network into a constrained optimization problem." Some of this idea might be the founding stones for analytical approach to design deep neural nets instead of trials and errors as what everyone seems to be doing right now.
+
