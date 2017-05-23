@@ -1,0 +1,19 @@
+Lecture: http://techtv.mit.edu/collections/bcs/videos/30698-what-s-wrong-with-convolutional-nets
+
+[2:00] Slide này nêu 2 nhược điểm của CNN:
+
+Nhược điểm 1: "Too few level of structure" -> cái này thì rõ ràng rồi, mạng neuron của con người có hàng tỷ neurons và vô cùng phức tạp đến nỗi không ai hiểu được,
+mạng CNN phổ biến thì chỉ có vài mống layer. Mạnh nhất là mạng DenseNet có hơn 1k layers nhưng 1k là quá khiêm tốn so với não người.
+    
+Nhược điểm 2: "need to group the neurons in each layer into capsules that do a lot of internal computation and then output a compact result"
+Cái này thì mình không hiểu lắm là bác ấy định nói gì. Slide sau [2:50] bác ấy nói rằng một capsule thể hiện một 
+"multi-dimensional entity of the type that the capsule detects", và "a capsule detects two things:"
+-1. The probability that an object of that type is present.
+-2. The generalized pose of the object which includes position, orientation, scale, deformation, velocity, color, etc...
+
+Thật sự là đến đây mới chỉ nghe có 3 phút nhưng mình đã lại nhớ cái hồi học khóa NN của bác này trên Coursera: cảm giác rất nản vì không biết
+bác ấy định nói gì. Kiểu cứ một mình bác chơi một kiểu từ vựng. Filter thì gọi quách là filter, feature map thì gọi quách là feature map nhưng người ta đi.
+Sao phải gọi là "capsule"? Mà "group the neurons into capsules that do a lot of internal computation" thì liên quan gì tới nhược điểm?
+Với lại capsule tại sao lại vừa thể hiện một số (probability), vừa thể hiện một vector toán học (multi-dimensional entity), lại vừa thể hiện
+features 2D (position, orientation, velocity), rồi lại đại lượng số học (scale, color)? Nói chung là khó chịu. Sau 2 năm học đủ các thứ
+trên đời thì bài giảng của bác Hinton này là khó nuốt nhất.
