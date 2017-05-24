@@ -16,7 +16,7 @@ Thật sự là đến đây mới chỉ nghe có 3 phút nhưng mình đã lạ
 bác ấy định nói gì. Kiểu cứ một mình bác chơi một kiểu từ vựng. Filter thì gọi quách là filter, feature map thì gọi quách là feature map.
 Sao phải gọi là "capsule"? Mà "group the neurons into capsules that do a lot of internal computation" thì liên quan gì tới nhược điểm?
 Với lại capsule tại sao lại vừa thể hiện một số (probability), vừa thể hiện một vector toán học (multi-dimensional entity), lại vừa thể hiện
-features 2D (position, orientation, velocity), rồi lại đại lượng số học (scale, color)? Nói chung là khó chịu. Sau 2 năm học đủ các thứ
+features 2D (position, orientation, velocity), rồi lại đại lượng vật lý (scale, color)? Nói chung là khó hiểu. Sau 2 năm học đủ các thứ
 trên đời thì bài giảng của bác Hinton này là khó nuốt nhất.
 
 [8:28] On pooling layer: "The fact that it works so well is extremely unfortunate because that makes it harder to get rid of" :)) 
