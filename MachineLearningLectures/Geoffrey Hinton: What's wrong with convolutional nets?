@@ -67,3 +67,4 @@ một cái Neural net sẽ học nhiều task cùng một lúc và lớp output 
 các layers ở dưới sẽ không chỉ nhận gradients từ layer ở trên mà còn nhận trực tiếp gradients của loss gắn vào nó. Ý tưởng là chỉ gắn thêm loss
 cho layers ở dưới vì các layers ở dưới phải học được các features cơ bản nhất mà có ích cho nhiều tác vụ khác nhau.
 
+[Sau đấy] Phần sau giải thích khá khó hiểu, lúc nào khỏe quay lại xem tiếp.
