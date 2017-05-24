@@ -36,3 +36,11 @@ so hard for us to combine these two features together in a good way (e.g. come u
 , how could we expect coordinate-lacking ANN (especially CNN) to do that? At this point I start feel like CNN and RNN are our heros who have different
 super powers, just like the Flash and Superman, yet they are not gods and have weeknesses.
 
+[23:48] Tổng kết Conclusion của argument 1: đến đây ta thấy rõ hơn là tại sao cái "nhận thức" lại liên kết tới ví dụ ở trên. Vì 
+activations của neurons trong não người thể hiện một nhận thức, mà nhận thức ấy thay đổi cực nhiều theo hệ quy chiếu (frame) được nhúng
+trong các vật thể xung quanh ta ("frames embedded in objects"), nên đây rõ ràng là điểm yếu của CNN khi một mạng CNN chỉ có thể phản 
+ánh cái frame của người chụp ảnh tạo ra dataset cho nó mà thôi. Đây sẽ là một luận điểm quan trọng khi làm object segmentation trong occluded
+environment, khi mà khung cảnh bị ảnh hưởng nặng nề bởi các vật thể khác. Hệ quả thú vị hơn là có thể trong tương lai nếu ANN có cơ chế
+tốt hơn não người thì con người sẽ không thể verify hoặc analyze các thuật toán AI bằng manual error analysis được nữa, vì những gì AI
+nhìn thấy sẽ khác con người nhìn thấy.
+
