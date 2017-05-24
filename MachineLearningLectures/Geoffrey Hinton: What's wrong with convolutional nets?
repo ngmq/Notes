@@ -2,18 +2,37 @@ Lecture: http://techtv.mit.edu/collections/bcs/videos/30698-what-s-wrong-with-co
 
 [2:00] Slide này nêu 2 nhược điểm của CNN:
 
-Nhược điểm 1: "Too few level of structure" -> cái này thì rõ ràng rồi, mạng neuron của con người có hàng tỷ neurons và vô cùng phức tạp đến nỗi không ai hiểu được,
-mạng CNN phổ biến thì chỉ có vài mống layer. Mạnh nhất là mạng DenseNet có hơn 1k layers nhưng 1k là quá khiêm tốn so với não người.
+Nhược điểm 1: "Too few level of structure" -> cái này thì rõ ràng rồi, mạng neuron của con người có hàng tỷ neurons và vô cùng phức tạp 
+đến nỗi không ai hiểu được, mạng CNN phổ biến thì chỉ có vài mống layer. Mạnh nhất là mạng DenseNet có hơn 1k layers nhưng 
+1k là quá khiêm tốn so với não người.
     
-Nhược điểm 2: "need to group the neurons in each layer into capsules that do a lot of internal computation and then output a compact result"
+Nhược điểm 2: "need to group the neurons in each layer into capsules that do a lot of internal computation and then output a compact result."
 Cái này thì mình không hiểu lắm là bác ấy định nói gì. Slide sau [2:50] bác ấy nói rằng một capsule thể hiện một 
 "multi-dimensional entity of the type that the capsule detects", và "a capsule detects two things:"
 -1. The probability that an object of that type is present.
 -2. The generalized pose of the object which includes position, orientation, scale, deformation, velocity, color, etc...
 
 Thật sự là đến đây mới chỉ nghe có 3 phút nhưng mình đã lại nhớ cái hồi học khóa NN của bác này trên Coursera: cảm giác rất nản vì không biết
-bác ấy định nói gì. Kiểu cứ một mình bác chơi một kiểu từ vựng. Filter thì gọi quách là filter, feature map thì gọi quách là feature map nhưng người ta đi.
+bác ấy định nói gì. Kiểu cứ một mình bác chơi một kiểu từ vựng. Filter thì gọi quách là filter, feature map thì gọi quách là feature map.
 Sao phải gọi là "capsule"? Mà "group the neurons into capsules that do a lot of internal computation" thì liên quan gì tới nhược điểm?
 Với lại capsule tại sao lại vừa thể hiện một số (probability), vừa thể hiện một vector toán học (multi-dimensional entity), lại vừa thể hiện
 features 2D (position, orientation, velocity), rồi lại đại lượng số học (scale, color)? Nói chung là khó chịu. Sau 2 năm học đủ các thứ
 trên đời thì bài giảng của bác Hinton này là khó nuốt nhất.
+
+[8:28] On pooling layer: "The fact that it works so well is extremely unfortunate because that makes it harder to get rid of" :)) 
+đúng là ngữ khí của bậc đại cao thủ, sẵn sàng phê phán tới cùng một kiến trúc thần thánh đã làm điên đảo thế giới. Những nghiên cứu gần đây
+về Fully Convolutional Nets (FCN hoặc FCNN) đã chứng minh là nhận định của bác Hinton là hoàn toàn có cơ sở, khi mà pooling layer
+thật ra là không cần thiết và có thể mô phỏng pooling bằng non-overlapping conv layer. Cách bác Hinton đặt vấn đề và diễn giải cho thấy
+một nội công Cửu Dương thần công tinh thuần bá đạo của 1 người đã làm neural net từ những năm 87s.
+
+[9:04] On activation: "The activations in the last hidden layer of a deep convnet are a percept", có thể dịch là "activations của 
+lớp hidden layer cuối cùng của một mạng CNN là một sự nhận thức". Trong câu này có rất nhiều điểm đáng chú ý: lớp hidden cuối cùng là 
+lớp nào? Là lớp convolution cuối cùng hay là lớp fully connected cuối cùng? Đặc biệt hơn cả là khái niệm "percept". Activations của
+cái lớp cuối cùng này không chỉ là một đống số thực vô tri vô giác mà là một "nhận thức". 
+
+[13:51] "So I'm gonna give you an example that illustrates the power of coordinate frame" => epic example, reminds me TBBT every time :))
+On a serious note, the example does have a very good point: each half of the tetrahedron can be seen as primitive features, and if it's
+so hard for us to combine these two features together in a good way (e.g. come up with good coordinate frames)
+, how could we expect coordinate-lacking ANN (especially CNN) to do that? At this point I start feel like CNN and RNN are our heros who have different
+super powers, just like the Flash and Superman, yet they are not gods and have weeknesses.
+
