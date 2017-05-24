@@ -30,11 +30,11 @@ lớp hidden layer cuối cùng của một mạng CNN là một sự nhận th�
 lớp nào? Là lớp convolution cuối cùng hay là lớp fully connected cuối cùng? Đặc biệt hơn cả là khái niệm "percept". Activations của
 cái lớp cuối cùng này không chỉ là một đống số thực vô tri vô giác mà là một "nhận thức". 
 
-[13:51] "So I'm gonna give you an example that illustrates the power of coordinate frame" => epic example, reminds me TBBT every time :))
+[13:51] "So I'm gonna give you an example that illustrates the power of coordinate frame" => epic example, reminds me of TBBT every time :))
 On a serious note, the example does have a very good point: each half of the tetrahedron can be seen as primitive features, and if it's
 so hard for us to combine these two features together in a good way (e.g. come up with good coordinate frames)
 , how could we expect coordinate-lacking ANN (especially CNN) to do that? At this point I start feel like CNN and RNN are our heros who have different
-super powers, just like the Flash and Superman, yet they are not gods and have weeknesses.
+super powers, just like the Flash and Superman, yet they are not gods and they have weeknesses.
 
 [23:48] Tổng kết Conclusion của argument 1: đến đây ta thấy rõ hơn là tại sao cái "nhận thức" lại liên kết tới ví dụ ở trên. Vì 
 activations của neurons trong não người thể hiện một nhận thức, mà nhận thức ấy thay đổi cực nhiều theo hệ quy chiếu (frame) được nhúng
@@ -43,4 +43,27 @@ trong các vật thể xung quanh ta ("frames embedded in objects"), nên đây 
 environment, khi mà khung cảnh bị ảnh hưởng nặng nề bởi các vật thể khác. Hệ quả thú vị hơn là có thể trong tương lai nếu ANN có cơ chế
 tốt hơn não người thì con người sẽ không thể verify hoặc analyze các thuật toán AI bằng manual error analysis được nữa, vì những gì AI
 nhìn thấy sẽ khác con người nhìn thấy.
+
+[38:00 - 39:xx] Đoạn này bác Hinton giành rất nhiều thời gian nói về routing. Ý tưởng của routing là layer ở dưới sẽ truyền thông tin lên layer 
+ở trên (tính từ input image tới fully connected layer là từ dưới lên trên). Khi pooling thì có những thông tin quan trọng bị mất ở 
+lớp pooling layer mà layer trên không thể "hỏi" trực tiếp layer ở dưới được (thêm 1 lý do để bác Hinton ghét pooling layer :))). 
+Slide ở 40:11 tiếp theo "Proof of Concept" là cực kỳ quan trọng.
+
+[40:11] "A proof of concept". Slide này có 2 điểm:
+- "The aim is to demonstrate that it is possible to learn a shallow hierrachy of parts using supervised SGD with no hand-engineering of the parts."
+Đây chính là tinh thần tối thượng của CNN. Điểm đặc biệt là ở chữ "shallow". Như thế nào thì đủ "shallow"? 
+- "The design of the system forces it to extract the poses of parts and to recognize objects by using the agreement of pose predictions."
+SIÊU LIÊN QUAN! Đây là điểm mà mình đã suy nghĩ từ lâu: "ép" layer của CNN phải học cái mình muốn như thế nào? Và ép tới mức nào thì không
+đánh mất ý nghĩa của việc "tự học"? Đoạn text trong slide ở ngay dưới nêu một gợi ý:
+    - But the system decides for itself what the parts are and what intrinsic coordinate frames to embed them.
+Như vậy là ta sẽ ép cho CNN học "tư thế" (pose) của objects, nhưng cái tư thế ấy được mô tả trong hệ tọa độ nào thì ta không quan tâm, miễn sao đủ 
+độ chi tiết để phân biệt object là được.
+
+Đến đây cần phải nhớ lại cái trăn trở của mình khi đọc về tăng performance cho CNN, đấy là khả năng 
+"overfit in the high layers and underfit in the low layers due to poor gradients backpropagation". Việc weights của một network được initialize
+randomly và quá trình gradients backpropagation không kiểm soát tốt dẫn tới là cả network không học được gì. Một trong số những cách khắc phục 
+mà mình đã nhìn thấy ở các model nổi tiếng gần đây như ResNet, DenseNet là việc họ có nhiều output! Theo một cách hiểu là giống như transfer learning,
+một cái Neural net sẽ học nhiều task cùng một lúc và lớp output của các task đó sẽ gắn với các mức hidden layer khác nhau. Như vậy,
+các layers ở dưới sẽ không chỉ nhận gradients từ layer ở trên mà còn nhận trực tiếp gradients của loss gắn vào nó. Ý tưởng là chỉ gắn thêm loss
+cho layers ở dưới vì các layers ở dưới phải học được các features cơ bản nhất mà có ích cho nhiều tác vụ khác nhau.
 
