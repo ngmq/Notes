@@ -23,3 +23,9 @@ and the need for customized loss function in ML systems.
   - Friendly measures: closed-form solution, convex optimization: cái này thì rõ ràng là tiện lợi rồi, nhưng thực tế thì hầu như
   không có. Lý do là để có convex optimization thì phải đặt thêm nhiều constraints, mà giải đống constraints đấy thường cũng là
   intractable
+  
+  
+[36:39 - 48:00] "target function is not always a function" -> bởi vì là có noise. Tựu trung lại thì mục tiêu của supervised ML là học cái phân phối xác suất P(y_i | x_i). Thế vai trò của cái unknown distribution p(x) có ý nghĩa gì? p(x) sẽ được phản ánh trong dataset: vùng dữ liệu nào có p(x) lớn thì sẽ xuất hiện nhiều trong dataset và có khả năng được học chính xác hơn. Lưu ý là trong literature có 
+joint distribution p(x, y) nhưng target distribution vẫn là p(y|x).
+
+
