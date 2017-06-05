@@ -62,4 +62,26 @@ In each of these situations, expert knowledge is required to build the underlyin
 Thì ra GP có ứng dụng rộng rãi và quan trọng khủng khiếp như thế, thảo nào bác Kevin P. Murphy dành hẳn một chương trong sách về nó.
   
   
+(ML 19.5) Positive semidefinite kernels (Covariance functions) 
 
+- k(x, y) = f(x - y): "stationary kernel" => (x, y) and (x+a, y+a) has the same k
+- k(x, y) = f(|x - y|): "isotrophic" 
+
+(ML 19.6) Inner products and PSD kernels 
+
+Mercers' theorem: under "fairly general" conditions, any positive semidefinite kernel can be represented in some Hilber space.
+
+
+# GP for Regression
+Xét bài toán con sau đây: Cho một mô hình Z ~ N(muy, K) in R^n và epsilon ~ N(0, sigma^2 * I) in R^n indepedent, và biến phụ thuộc
+    Y = Z + epsilon
+    
+Ta được cho m (m > 0) giá trị (Z1, Y1), (Z2, Y2), ..., (Zm, Ym). Khi có một giá trị mới Z' thì Y' tương ứng thuộc phân phối như 
+thế nào?
+
+Dễ thấy là Y ~ N(muy, K + sigma^2 * I). Chứng minh được là phân phối có điều kiện (Y'|Z_1..m, Y_1..m) là phân phối chuẩn N(m, D)
+trong đó m, D đều tính được ngay (công thức quá phức tạp, xem trong video 19.10)
+
+Áp dụng sang GP: Chọn mean function và covariance function muy(x) và K(x), ta được một GP với Z(x) đóng vai trò hệt như Z ở trên.
+Từ đó ta có một phân phối xác suất của Y'. Để làm inference thì ta chọn hàm loss (ví dụ như log likelihood) và dùng phân phối xác suất
+vừa tìm được để cực tiểu hóa hàm loss tương ứng.
