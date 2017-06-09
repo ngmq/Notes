@@ -41,6 +41,8 @@ def chinese_restaurant_process(no_customers, alpha):
 print( chinese_restaurant_process(10, 1.0) )
 ```
 
+**Nhận xét 1:** Để ý là việc generate cluster mới được thực hiện deterministic (current_cluster += 1). Trong mô hình Bayes ta muốn có một cái prior distribution để generate ra cluster mới tùy thích cơ. Điều này dẫn tới Polya Urn Model trong đó cluster mới được sinh ra từ một hàm color_distribution.
+
 Polya Urn Model: 
 
 ```python
@@ -67,6 +69,10 @@ def polya_urn_model(color_distribution, no_balls, alpha):
     
     
 print( polya_urn_model(uniform_color_distribution, 10, 3.2) )
+# [0.4, 0.1, 0.94, 0.94, 0.71, 0.71, 0.71, 0.57, 0.74, 0.94]
+# [0.14, 0.17, 0.73, 0.73, 0.17, 0.17, 0.17, 0.17, 0.35, 0.17]
 
 ```
-Để ý rằng sự khác biệt giữa Chinese Restaurant Process và Polya Urn Model là CRP chỉ quyết định distribution của clusters thôi (hàm random trả về index của colors), còn PUM thì quyết định cả distribution của cluster (uniform) và parameters của clusters (ở đây chính là các số 0.14, 0.55 random từ công thức randomint(0, 100) / 100.0).
+**Nhận xét 2:** Để ý rằng sự khác biệt giữa Chinese Restaurant Process và Polya Urn Model là CRP chỉ quyết định distribution của clusters thôi (hàm random trả về index của colors, còn cluster mới lúc nào cũng là cluster cũ cộng 1), còn PUM thì quyết định cả distribution của cluster (uniform) và parameters của clusters (ở đây chính là các số 0.14, 0.55 random từ công thức randomint(0, 100) / 100.0).
+
+**Nhận xét 3:** Giả sử ta cho CRP hoặc PUM chạy liên tục không nghỉ. Tới một lúc nào đó khi có quá nhiều bóng trong mỗi cluster rồi và kích cỡ của res trong CRP hoặc colors trong PUM trở nên vô cùng lớn, thì giá trị threshold *alpha / (alpha * len(colors))* sẽ xấp xỉ 0. Điều này có nghĩa là sẽ không có thêm bất cứ clusters mới nào được tạo thành nữa và ta có một sự *hội tụ*, mỗi cluster sẽ có một weight riêng indicate xác suất mà một quả bóng mới sẽ thuộc về cluster đó.
