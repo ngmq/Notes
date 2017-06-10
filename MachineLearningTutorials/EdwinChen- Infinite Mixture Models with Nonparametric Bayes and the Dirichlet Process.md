@@ -112,6 +112,122 @@ print(weights)
 # Dirichlet Process for GMM clustering
 *Câu hỏi dẫn dắt:* DP với GMM "mang tiếng" là có thể giúp giải quyết vấn đề không cần xác định trước số lượng clusters. DP làm việc đó như thế nào? Trong ba tiến trình đề cập ở trên thì threshold cho việc tạo mới cluster chỉ được quyết định bởi alpha mà thôi. Khi làm thuật toán phân cụm thì ta thấy là chỉ nên tạo cluster mới khi điểm data đang xét cách xa tất cả các điểm còn lại. Vậy, DP mô phỏng tư tưởng cách xa thì nên tạo mới như thế nào?
 
-Từ những bài giảng khác như [Dirichlet Process Mixture Models and Gibbs Sampling by Jordan Boyd-Graber](https://www.youtube.com/watch?v=UTW530-QVxo&t=1216s), ta biết cách làm là bắt đầu từ một cái random assignment và sau đó dùng unsupervised learning technique nào đó để cái assignment đó hội tụ. Trong phần sau ta thử nghiên cứu kỹ về Gibbs Sampling là một technique xử lý việc hội tụ này theo paper 6 trang của MIT: *Bayesian Inference: Gibbs Sampling* của tác giả *Ilker Yildirim* (http://www.mit.edu/~ilkery/papers/GibbsSampling.pdf)
+Từ kinh nghiệm làm K-means và từ những bài giảng khác như [Dirichlet Process Mixture Models and Gibbs Sampling by Jordan Boyd-Graber](https://www.youtube.com/watch?v=UTW530-QVxo&t=1216s), ta biết cách làm là bắt đầu từ một cái random assignment và sau đó dùng unsupervised learning technique nào đó để cái assignment đó hội tụ (một random assignment tương ứng với việc gán randomly các giá trị cho các latent variables, với GMM thì các latent variables là các mean và variance của các Gaussian). Trong phần sau ta thử nghiên cứu kỹ về Gibbs Sampling là một technique xử lý việc hội tụ này theo paper 6 trang của MIT: *Bayesian Inference: Gibbs Sampling* của tác giả *Ilker Yildirim* (http://www.mit.edu/~ilkery/papers/GibbsSampling.pdf)
 
-## Gibbs Sampling
+## Gibbs Sampling in general form
+
+Việc đi tìm phân phối posterior của các latent variables như mean và variance của các Gaussian trong GMM được gọi là [Bayes inference](https://en.wikipedia.org/wiki/Bayesian_inference). Vấn đề kinh điển của Bayes Inference lại vẫn là computational complexity của cái posterior. Công thức Bayes tính posterior là:
+    p(latent_vars | observed_data) = p(observed_data | latent_vars) * p(latent_vars) / p(observed_data)
+    
+Trong đó, cái p(observed_data) = tích phân qua tất cả các possible values của latent_vars. Cái tích phân này không bao giờ tính được. Vậy làm sao để tính được cái posterior đây? 
+
+Câu trả lời: không cần tính mà chỉ cần xấp xỉ cái posterior là được. 
+
+Vì phần trên đã nói tới "hội tụ", ta làm rõ luôn sự "hội tụ" ở đây là hội tụ của distribution. Paper viết ở trang 2: *"However, the theory of MCMC guarantees that the stationary distribution of the samples generated under Algorithm 1 is the target joint posterior that we are interested in (Gilks et al., 1996; also see the Computational Cognition Cheat Sheet on Metropolis-Hastings sampling). For this reason, MCMC algorithms are typically run for a large number of iterations (in the hope that convergence to the target posterior will be achieved)"*
+
+Như vậy, Gibbs sampling cung cấp một phương pháp xấp xỉ cái posterior trong Bayes Inference bằng cách tạo ra các posterior conditional distribution với từng latent variable một, khi làm tới variable nào thì tạm thời coi đống còn lại là constant. Lý thuyết đảm bảo rằng khi sample một số lần đủ lớn thì tất cả đống posterior conditional distributions ấy sẽ trở nên không thay đổi (hội tụ về stationary), và nếu tiến hành sampling lần lượt trên đống conditional distributions ấy, mỗi lần sampling lấy ra một latent variable, thì samples thu được sẽ tương tự như việc sample một lần trên cái posterior. Rất ảo diệu :))
+
+Tuy nhiên đến đây lại có một vấn đề phát sinh: làm sao chắc chắn là cái đống conditional distributions đấy có dạng closed form (i.e well known) để mà sample từ nó? 
+
+Conjugate priors come to the rescue!
+
+Ta lại nhớ lại các bài học về các cặp conjugate priors: khi likelihood là một loại hàm và prior là một loại hàm khác sao cho cặp hai hàm này đặc biệt thì cái posterior nó sẽ có dạng trùng với hàm prior. Như vậy, nếu hàm prior của mỗi latent variable là hàm well known thì nó sẽ làm cho hàm posterior conditional distribution đấy cũng sẽ là hàm well known, và như vậy thì sẽ dễ dàng draw samples từ đó. Kể cả nếu cái hàm posterior conditional distribution mà không well known, nhưng biến latent đang xét là rời rạc và khoảng giá trị không lớn lắm, thì ta có thể tính trực tiếp p(var_rời_rạc_đó | những cái khác) và cho nó thành multinomial distribution, như paper đã làm với biến n ở equation 10.
+
+Full code của ví dụ trong paper (có thể download tại [đây](http://www2.bcs.rochester.edu/sites/jacobslab/cheat_sheet/GibbsSampling.code.py)) :
+```python
+# Gibbs sampler for the change-point model described in a Cognition cheat sheet titled "Gibbs sampling."
+# This is a Python implementation of the procedure at http://www.cmpe.boun.edu.tr/courses/cmpe58n/fall2009/
+# Written by Ilker Yildirim, September 2012.
+
+from scipy.stats import uniform, gamma, poisson
+import matplotlib.pyplot as plt
+import numpy
+from numpy import log,exp
+from numpy.random import multinomial
+
+# fix the random seed for replicability.
+numpy.random.seed(123456789)
+
+# Generate data
+
+# Hyperparameters
+N=50
+a=2
+b=1
+
+# Change-point: where the intensity parameter changes.
+n=int(round(uniform.rvs()*N))
+print str(n)
+
+# Intensity values
+lambda1=gamma.rvs(a,scale=1./b) # We use 1/b instead of b because of the way Gamma distribution is parametrized in the package random.
+lambda2=gamma.rvs(a,scale=1./b)
+
+lambdas=[lambda1]*n
+lambdas[n:N-1]=[lambda2]*(N-n)
+
+# Observations, x_1 ... x_N
+x=poisson.rvs(lambdas)
+
+# make one big subplots and put everything in it.
+f, (ax1,ax2,ax3,ax4,ax5)=plt.subplots(5,1)
+# Plot the data
+ax1.stem(range(N),x,linefmt='b-', markerfmt='bo')
+ax1.plot(range(N),lambdas,'r--')
+ax1.set_ylabel('Counts')
+
+# Gibbs sampler
+E=5200
+BURN_IN=200
+
+# Initialize the chain
+n=int(round(uniform.rvs()*N))
+lambda1=gamma.rvs(a,scale=1./b)
+lambda2=gamma.rvs(a,scale=1./b)
+
+# Store the samples
+chain_n=numpy.array([0.]*(E-BURN_IN))
+chain_lambda1=numpy.array([0.]*(E-BURN_IN))
+chain_lambda2=numpy.array([0.]*(E-BURN_IN))
+
+for e in range(E):
+    print "At iteration "+str(e)
+    # sample lambda1 and lambda2 from their posterior conditionals, Equation 8 and Equation 9, respectively.
+    lambda1=gamma.rvs(a+sum(x[0:n]), scale=1./(n+b))
+    lambda2=gamma.rvs(a+sum(x[n:N]), scale=1./(N-n+b))
+
+    # sample n, Equation 10
+    mult_n=numpy.array([0]*N)
+    for i in range(N):
+        mult_n[i]=sum(x[0:i])*log(lambda1)-i*lambda1+sum(x[i:N])*log(lambda2)-(N-i)*lambda2
+    mult_n=exp(mult_n-max(mult_n))
+    # mult_n=exp(mult_n) # still works!
+    n=numpy.where(multinomial(1,mult_n/sum(mult_n),size=1)==1)[1][0]
+
+    # store
+    if e>=BURN_IN:
+        chain_n[e-BURN_IN]=n
+        chain_lambda1[e-BURN_IN]=lambda1
+        chain_lambda2[e-BURN_IN]=lambda2
+
+
+ax2.plot(chain_lambda1,'b',chain_lambda2,'g')
+ax2.set_ylabel('$\lambda$')
+ax3.hist(chain_lambda1,20)
+ax3.set_xlabel('$\lambda_1$')
+ax3.set_xlim([0,12])
+ax4.hist(chain_lambda2,20,color='g')
+ax4.set_xlim([0,12])
+ax4.set_xlabel('$\lambda_2$')
+ax5.hist(chain_n,50)
+ax5.set_xlabel('n')
+ax5.set_xlim([1,50])
+plt.show()
+```
+
+Xong, sau khi có (xấp xỉ của) posterior rồi thì làm gì tiếp? Hiển nhiên là có thể làm maximum likelihood để tìm ra bộ giá trị hợp lý nhất cho các latent variables. Với ví dụ trong paper, nhìn vào hình vẽ histogram xấp xỉ distribution ở trang cuối ta thấy là nên chọn lambda1 khoảng 2.98 (giá trị ground truth là 3.074), lambda2 khoảng 8.9 (ground truth là 9.8), n khoảng 26.9 (ground truth là 27)
+
+## Gibbs sampling with Dirichlet Process distributed prior
+
+Note của phần này sẽ combine nội dung từ [Jacob Labs - Computational Cognition Cheat Sheets - Bayesian Statistics: Dirichlet Processes](http://www2.bcs.rochester.edu/sites/jacobslab/cheat_sheet/dpmm.pdf) và hai PhD Theses giải thích Gibbs sampling cho Dirichlet Processes mà paper đó đề cập là [Nonparametric Bayesian Discrete Latent Variable Models for Unsupervised Learning](http://www.gatsby.ucl.ac.uk/~dilan/papers/gorurDilan_thesis.pdf) và [Graphical models for visual object recognition and tracking](https://dspace.mit.edu/handle/1721.1/34023)
+
