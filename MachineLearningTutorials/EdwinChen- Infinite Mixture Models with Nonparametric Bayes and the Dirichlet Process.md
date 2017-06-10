@@ -80,3 +80,28 @@ print( polya_urn_model(uniform_color_distribution, 10, 3.2) )
 **Nhận xét 3:** Giả sử ta cho CRP hoặc PUM chạy liên tục không nghỉ. Tới một lúc nào đó khi có quá nhiều bóng trong mỗi cluster rồi và kích cỡ của res trong CRP hoặc colors trong PUM trở nên vô cùng lớn, thì giá trị threshold *alpha / (alpha * len(colors))* sẽ xấp xỉ 0. Điều này có nghĩa là sẽ không có thêm bất cứ clusters mới nào được tạo thành nữa và ta có một sự *hội tụ*, mỗi cluster sẽ có một weight riêng (bằng *nk / (len(colors) + alpha)*) indicate xác suất mà một quả bóng mới sẽ thuộc về cluster đó. Có cách nào randomly sinh ra thẳng được những cái weight này mà không cần phải chạy CRP hoặc PUM liên tục ngày đêm hay không? Câu trả lời là có, chính là **Stick-Breaking Process**.
 
 # Stick-Breaking Process
+```python
+import numpy as np
+# import matplotlib.pyplot as plt
+
+def stick_breaking_process(no_sticks, alpha):
+    betas = np.random.beta(1, alpha, no_sticks - 1)
+    weights = list()
+    last = 1.0
+    for beta in betas:
+        w = last * beta
+        weights.append(w)
+        last = last * (1.0 - beta)
+    
+    w = last
+    weights.append(w)
+    return weights
+    
+weights = stick_breaking_process(5, 0.9)
+print(np.sum(weights)) # should be 1.0 no matter what
+print(weights)
+# Run 1: [0.11519179905627835, 0.043693851100807479, 0.27923691462392553, 0.24671585739138038, 0.31516157782760829]
+# Run 2: [0.51627208407975589, 0.15467214315560243, 0.065677280324127035, 0.0016998670346014386, 0.26167862540591313]
+# Run 3: [0.91932155608029531, 0.019377813599789476, 0.0019257903047440459, 0.033467049442477158, 0.025907790572694014]
+```
+
