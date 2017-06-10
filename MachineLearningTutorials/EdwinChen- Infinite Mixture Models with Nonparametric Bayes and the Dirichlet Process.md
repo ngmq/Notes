@@ -105,3 +105,8 @@ print(weights)
 # Run 3: [0.91932155608029531, 0.019377813599789476, 0.0019257903047440459, 0.033467049442477158, 0.025907790572694014]
 ```
 
+**Nhận xét 4:** SBP, cũng giống như CRP, chỉ trả về probabilities của distributions (dưới dạng weights) của partitions mà không xác định thông số cụ thể (parameters) của từng partition như là PUM. Tuy nhiên, trong khi CPR là sequential process (từng customer một, người trước người sau) thì SBP có thể được tiến hành in parallel (cứ sample hết mấy giá trị beta cùng lúc là được). 
+
+**Nhận xét 5:** Output của cả 3 tiến trình ở trên đều là random instances of distributions. Khi có thêm base distribution G0 cho SBP và CRP thì ta có một Dirichlet Process hoàn chỉnh. Định nghĩa: Dirichlet Process là distribution of distributions. DP có thể được biểu diễn bởi một trong ba process con ở trên, cái nào không quan trọng, vì với G0 và alpha là đủ để sinh ra cả weights lẫn parameters của các partitions rồi. Thêm vào đó, với cùng một input là số lượng điểm data point (trong các hàm trên là no_balls) thì số partition (số lượng điểm phân biệt trong output) của DP là biến đổi liên tục. Kể từ sau đây, thay vì dùng từ "partition" ta sử dụng từ "cluster" để nói về thuật toán phân cụm (clustering) với Gaussian Mixture Model (GMM) và DP.
+
+# Dirichlet Process for GMM clustering
