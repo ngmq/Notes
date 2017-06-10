@@ -114,4 +114,4 @@ print(weights)
 
 Từ những bài giảng khác như [Dirichlet Process Mixture Models and Gibbs Sampling by Jordan Boyd-Graber](https://www.youtube.com/watch?v=UTW530-QVxo&t=1216s), ta biết cách làm là bắt đầu từ một cái random assignment và sau đó dùng unsupervised learning technique nào đó để cái assignment đó hội tụ. Trong phần sau ta thử nghiên cứu kỹ về Gibbs Sampling là một technique xử lý việc hội tụ này theo paper 6 trang của MIT: *Bayesian Inference: Gibbs Sampling* của tác giả *Ilker Yildirim* (http://www.mit.edu/~ilkery/papers/GibbsSampling.pdf)
 
-## Gibss Sampling
+## Gibbs Sampling
