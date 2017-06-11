@@ -230,7 +230,7 @@ Xong, sau khi có (xấp xỉ của) posterior rồi thì làm gì tiếp? Hiể
 ## Gibbs sampling with Dirichlet Process distributed prior
 
 Note của phần này sẽ combine nội dung từ [Jacob Labs - Computational Cognition Cheat Sheets - Bayesian Statistics: Dirichlet Processes](http://www2.bcs.rochester.edu/sites/jacobslab/cheat_sheet/dpmm.pdf), [Xiaodong Yu - Gibbs Sampling Methods for Dirichlet Process
-Mixture Model:  Technical Details](https://pdfs.semanticscholar.org/9ece/0336316d78837076ef048f3d07e953e38072.pdf) và hai PhD Theses giải thích Gibbs sampling cho Dirichlet Processes mà paper đó đề cập là [Nonparametric Bayesian Discrete Latent Variable Models for Unsupervised Learning](http://www.gatsby.ucl.ac.uk/~dilan/papers/gorurDilan_thesis.pdf) và [Graphical models for visual object recognition and tracking](https://dspace.mit.edu/handle/1721.1/34023).
+Mixture Model:  Technical Details](https://pdfs.semanticscholar.org/9ece/0336316d78837076ef048f3d07e953e38072.pdf) và hai PhD Theses giải thích Gibbs sampling cho Dirichlet Processes mà paper đó đề cập là [Nonparametric Bayesian Discrete Latent Variable Models for Unsupervised Learning](http://www.gatsby.ucl.ac.uk/~dilan/papers/gorurDilan_thesis.pdf) và [Sudderth 2006 - Graphical models for visual object recognition and tracking](https://dspace.mit.edu/handle/1721.1/34023).
 
 ### Probabilistic model of DP
 Quay lại cơ bản chút về cơ chế sinh data gồm *n* points của DP: gồm 3 bước. 
@@ -246,6 +246,12 @@ Anw, a picture says a thousand words:
 
 Điểm tinh tế ở đây là hàm H có thể chọn đơn giản là tích của phân phối mean và phân phối variance (coi như mean và variance là độc lập). Khi đó ta có thể chọn mean là Uniform còn Variance là  Gamma để đảm bảo conjugate prior. Như vậy thì khi làm sampling tạo ra G, có thể sample độc lập các mean từ Uniform và các variance từ Gamma, miễn sao đảm bảo số lượng mean bằng số lượng variance là được.
 
-Đến đây, ta cũng đã có thể trả lời một cách tổng quát tất cả các câu hỏi dẫn dắt: *1) GP giải quyết vấn đề không chọn trước số clusters hoặc số maximal clusters nhưng trong Bayesian finite Mixture Model (BFMM) bằng cách sử dụng hàm phân phối multinomal G với K tiến tới +oo là prior cho số lượng clusters. 2) Việc ưu tiên tạo ra clusters mới dựa trên hàm distance được thực hiện thông qua việc update hàm posterior cho latent variables: number_clusters, means và variances tương ứng. Lúc quyết định xem nên có bao nhiêu clusters thì chỉ việc làm maximum likelihood trên posterior là xong.*
+Đến đây, ta cũng đã có thể trả lời một cách tổng quát tất cả các câu hỏi dẫn dắt: *1) GP giải quyết vấn đề không chọn trước số clusters hoặc số maximal clusters nhưng trong Bayesian finite Mixture Model (BFMM) bằng cách sử dụng hàm phân phối multinomal G với K tiến tới +oo là prior cho số lượng clusters. 2) Việc ưu tiên tạo ra clusters mới dựa trên hàm distance được thực hiện thông qua việc update hàm posterior cho latent variables: number_clusters, means và variances tương ứng. Điểm có large distance tới clusters sẽ thể hiện qua xác suất của likelihood là nhỏ. Sudderth PhD thesis viết: **"The likelihood F(theta) effectively imposes a notion of distance on X, and thus allows observations to be extrapolated to neighboring regions."** Lúc quyết định xem nên có bao nhiêu clusters thì chỉ việc làm maximum likelihood trên posterior là xong.*
+
+**Chú ý:** bước thứ 2 tùy thuộc vào process nào được dùng để biểu diễn GP. Nếu là CRP thì thay vì sample trực tiếp mean và variance thì sample một biến indicator z_i là index của phân phối Gauss trong G trỏ tới. Việc sử dụng biến phụ như thế này là kỹ thuật *Gibbs sampling with auxilliary variables*
 
 ### Gibbs sampling for DPGMM
+Phần này trình bày cách dùng Gibbs sampler trong 3 cách biểu diễn DPGMM: PUM, SBP và CRP. Nội dung chủ yếu từ "Gibbs Sampling Methods for Dirichlet Process Mixture Model: Technical Details".
+
+#### Using PUM representation
+Chi tiết derivation của cái posterior p(phi_i | phi_{-i}, x_i) mục 4.1, công thức 4.2:
