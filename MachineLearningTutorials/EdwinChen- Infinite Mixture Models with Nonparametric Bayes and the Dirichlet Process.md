@@ -229,5 +229,23 @@ Xong, sau khi có (xấp xỉ của) posterior rồi thì làm gì tiếp? Hiể
 
 ## Gibbs sampling with Dirichlet Process distributed prior
 
-Note của phần này sẽ combine nội dung từ [Jacob Labs - Computational Cognition Cheat Sheets - Bayesian Statistics: Dirichlet Processes](http://www2.bcs.rochester.edu/sites/jacobslab/cheat_sheet/dpmm.pdf) và hai PhD Theses giải thích Gibbs sampling cho Dirichlet Processes mà paper đó đề cập là [Nonparametric Bayesian Discrete Latent Variable Models for Unsupervised Learning](http://www.gatsby.ucl.ac.uk/~dilan/papers/gorurDilan_thesis.pdf) và [Graphical models for visual object recognition and tracking](https://dspace.mit.edu/handle/1721.1/34023)
+Note của phần này sẽ combine nội dung từ [Jacob Labs - Computational Cognition Cheat Sheets - Bayesian Statistics: Dirichlet Processes](http://www2.bcs.rochester.edu/sites/jacobslab/cheat_sheet/dpmm.pdf), [Xiaodong Yu - Gibbs Sampling Methods for Dirichlet Process
+Mixture Model:  Technical Details](https://pdfs.semanticscholar.org/9ece/0336316d78837076ef048f3d07e953e38072.pdf) và hai PhD Theses giải thích Gibbs sampling cho Dirichlet Processes mà paper đó đề cập là [Nonparametric Bayesian Discrete Latent Variable Models for Unsupervised Learning](http://www.gatsby.ucl.ac.uk/~dilan/papers/gorurDilan_thesis.pdf) và [Graphical models for visual object recognition and tracking](https://dspace.mit.edu/handle/1721.1/34023).
 
+### Probabilistic model of DP
+Quay lại cơ bản chút về cơ chế sinh data gồm *n* points của DP: gồm 3 bước. 
+
+- Bước 0: chọn alpha, một số thực, và H, một joint distribution bình thường của các latent variables. Ví dụ với GMM thì H sẽ là joint distribution của mean và variance (hoặc std dev hoặc precision = 1.0 / variance, ko quan trọng).
+- Bước 1: Sample một cái *countably infinite discrete multinomial distribution* G từ DP(alpha, G0) (cũng có thể viết là DP(alpha, H), nói chung ký hiệu base distribution là G0 hay H đều ok. Chắc từ đây viết là H cho dễ). 
+- Bước 2: Sample *n* điểm gốc (atoms) theta. Trong mô hình GMM, mỗi điểm gốc này tương ứng với một giá trị mean và variance (hoặc precision) của một Gaussian. Dễ thấy là trong *n* điểm gốc này sẽ có những điểm trùng nhau do G là discrete.
+- Bước 3: data point thứ *i* được sinh ra từ điểm gốc thứ *i* bằng cách sampling. Hàm F(theta_i) lúc này là hàm Gaussian.
+
+Anw, a picture says a thousand words:
+<img src="https://lh6.googleusercontent.com/4oYD0Z_s3zeP0NNAVf6roywiTPQOtrWmt5i2Vh3LIogfn5tL662xyc73y57V7iHlDj9tE93jBGtIHMo=w1599-h700">
+(hình cắt từ paper "Computational Cognition Cheat Sheets - Bayesian Statistics: Dirichlet Processes")
+
+Điểm tinh tế ở đây là hàm H có thể chọn đơn giản là tích của phân phối mean và phân phối variance (coi như mean và variance là độc lập). Khi đó ta có thể chọn mean là Uniform còn Variance là  Gamma để đảm bảo conjugate prior. Như vậy thì khi làm sampling tạo ra G, có thể sample độc lập các mean từ Uniform và các variance từ Gamma, miễn sao đảm bảo số lượng mean bằng số lượng variance là được.
+
+Đến đây, ta cũng đã có thể trả lời một cách tổng quát tất cả các câu hỏi dẫn dắt: *1) GP giải quyết vấn đề không chọn trước số clusters hoặc số maximal clusters nhưng trong Bayesian finite Mixture Model (BFMM) bằng cách sử dụng hàm phân phối multinomal G với K tiến tới +oo là prior cho số lượng clusters. 2) Việc ưu tiên tạo ra clusters mới dựa trên hàm distance được thực hiện thông qua việc update hàm posterior cho latent variables: number_clusters, means và variances tương ứng. Lúc quyết định xem nên có bao nhiêu clusters thì chỉ việc làm maximum likelihood trên posterior là xong.*
+
+### Gibbs sampling for DPGMM
