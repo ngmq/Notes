@@ -241,7 +241,7 @@ Quay lại cơ bản chút về cơ chế sinh data gồm *n* points của DP: g
 - Bước 3: data point thứ *i* được sinh ra từ điểm gốc thứ *i* bằng cách sampling. Hàm F(theta_i) lúc này là hàm Gaussian.
 
 Anw, a picture says a thousand words:
-<img src="https://lh6.googleusercontent.com/4oYD0Z_s3zeP0NNAVf6roywiTPQOtrWmt5i2Vh3LIogfn5tL662xyc73y57V7iHlDj9tE93jBGtIHMo=w1599-h700">
+<img src="https://github.com/ngmq/Notes/blob/master/imgs/DirichletProcess.png">
 (hình cắt từ paper "Computational Cognition Cheat Sheets - Bayesian Statistics: Dirichlet Processes")
 
 Điểm tinh tế ở đây là hàm H có thể chọn đơn giản là tích của phân phối mean và phân phối variance (coi như mean và variance là độc lập). Khi đó ta có thể chọn mean là Uniform còn Variance là  Gamma để đảm bảo conjugate prior. Như vậy thì khi làm sampling tạo ra G, có thể sample độc lập các mean từ Uniform và các variance từ Gamma, miễn sao đảm bảo số lượng mean bằng số lượng variance là được.
@@ -255,3 +255,6 @@ Phần này trình bày cách dùng Gibbs sampler trong 3 cách biểu diễn DP
 
 #### Using PUM representation
 Chi tiết derivation của cái posterior p(phi_i | phi_{-i}, x_i) mục 4.1, công thức 4.2:
+
+<img src="https://github.com/ngmq/Notes/blob/master/imgs/DerivationPosteriorPUM.png">
+
