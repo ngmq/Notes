@@ -68,3 +68,11 @@ plt.show()
 # plt.plot(x1, x2, 'ro')
 # plt.show()
 ```
+Output: 
+```python
+2.17262642904
+2.17262642904
+```
+
+Mistake 1: coi chừng dimension broadcasting của numpy
+Mistake 2: nhận ra Hebbian Learning thực ra là gradient descent giải bài toán first component của PCA
