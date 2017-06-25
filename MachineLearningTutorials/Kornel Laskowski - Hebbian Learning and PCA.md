@@ -26,6 +26,7 @@ Một cách tổng quát, Hebb rule cho ta biết rằng độ mạnh của syna
 
 Trong quá trình tìm hiểu về lý thuyết ẩn sau Deep Learning, một câu hỏi đặt ra là DL học sự độc lập giữa các neuron kiểu gì? Sự độc lập đó là độc lập như thế nào, PCA hay ICA? Phải chăng là mỗi neuron chứa một component của PCA của cái không gian nhiều chiều mà CNN học được? Nếu google tài liệu liên quan giữa neural nets và PCA một lúc, sẽ ra tài liệu như ở phần đầu, trong đó tác giả viết rằng áp dụng Hebb rule đủ lâu lên trên một bộ data đã được centrelized về mean 0 thì cái weight nó sẽ biến thành 1st component của PCA, tức là chiều của weight sẽ trùng với chiều giải thích dc nhiều variance nhất. Đây là một sự liên kết bất ngờ mà mình chưa bao giờ được học.
 
+![Hebb to PCA](https://github.com/ngmq/AI/blob/master/HebbianLearning/HebbToPCA.png)
 Hình minh họa từ tài liệu ở trên
 
 ## Từ nghi ngờ tới chứng minh
@@ -100,9 +101,11 @@ Output:
 2.17262642904
 2.17262642904
 ```
+Bằng nhau chằn chặn, không còn nghi ngờ gì nữa, nhận định trên hoàn toán chính xác. Ngoài ra nếu cho alpha thay đổi thì hội tụ nhanh hơn nhưng điểm hội tụ hơi fluctuate. Tiến trình gì cũng hội tụ nhanh hơn khi learning rate thay đổi và fluctuate nhỉ?
 
 Hình biểu diễn variance over time:
 
+![variance over time](https://github.com/ngmq/AI/blob/master/HebbianLearning/correct_variance_over_time.png)
 
 A ha, đồ thị rất mượt mà trơn tru. Đến đây ta có 2 lưu ý về 2 điểm debug đã giúp ta nhận ra 2 vấn đề:
 
@@ -111,11 +114,15 @@ A ha, đồ thị rất mượt mà trơn tru. Đến đây ta có 2 lưu ý v�
 
 Thí nghiệm trên cộng với thói quen viết alpha là learning rate giúp ta nhanh chóng nhận ra Hebbian Learning có dạng giống hệt như một tiến trình gradient descent (GD). Mà đã là GD thì nó phải giải bài toán tối ưu nào đó. Hàm tối ưu là gì? Vì đã biết trước Hebb learning hội tụ về PCA, ta chỉ cần chứng minh hàm tối ưu chính là minimum hàm khoảng cách từ các data points tới đường thẳng của vector W là xong.
 
-Minh họa khoảng cách từ bài viết hướng dẫn SVD của jeremykun (https://jeremykun.files.wordpress.com/2016/02/vectormax.png)
+Minh họa khoảng cách từ bài viết hướng dẫn SVD của jeremykun 
+
+![](https://jeremykun.files.wordpress.com/2016/02/vectormax.png)
 
 Công thức khoảng cách cho một data point là:
 
-Công thức khoảng cách từ ch18.pdf của cmu (http://www.stat.cmu.edu/~cshalizi/uADA/12/lectures/ch18.pdf)
+![](https://github.com/ngmq/AI/blob/master/HebbianLearning/DistanceFormula.png)
+
+Công thức khoảng cách lấy từ từ ch18.pdf của cmu (http://www.stat.cmu.edu/~cshalizi/uADA/12/lectures/ch18.pdf)
 
 Viết cho tất cả data point ta có ngay:
 
