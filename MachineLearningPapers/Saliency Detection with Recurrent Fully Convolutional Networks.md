@@ -110,7 +110,7 @@ step 3: compute the center of the foreground region and the number of foreground
 step 4: compute spatial confidence and color confidence: SC_{i,j} and CC_{i,j}.
 step 5: Hnew_{i,j} = SC_{i,j} * CC_{i,j} * H
 
-Then perform an edge-aware erosion on Hnew to obtain the final saliency map
+Then perform an edge-aware erosion [4] on Hnew to obtain the final saliency map
 
 # 4. Experiments
 
@@ -125,3 +125,13 @@ Test: apply the network in 03 different scales and then fuse all to the final ma
 - Ablation studies proved that the proposed approach is effective: prior, recurrent and pre-train strategy
 
 - Interesting results in comparision of RFCN-B and RFCN: RFCN-B always slightly outperforms RFCN in F-measure, but far behind in AUC.
+
+4. Gastal, E.S., Oliveira, M.M.: Domain transform for edge-aware image and video
+processing. ACM Trans. Graph. (TOG) 30, 69 (2011)
+
+17. Li, X., Zhao, L., Wei, L., Yang, M., Wu, F., Zhuang, Y., Ling, H., Wang, J.:
+Deepsaliency: multi-task deep neural network model for salient object detection.
+arXiv preprint arXiv:1510.05484 (2015)
+
+22. Long, J., Shelhamer, E., Darrell, T.: Fully convolutional networks for semantic
+segmentation. In: CVPR, pp. 3431–3440 (2015)
