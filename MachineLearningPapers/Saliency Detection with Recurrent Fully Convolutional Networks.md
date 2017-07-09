@@ -56,8 +56,6 @@ The paper uses negative log-likelihood loss function.
 
 Loss = -( sum_all_over_pixels_in_all_over_images 1(Ci,j = fg)log(p(li,j=fg)) + 1(Ci,j = bg)log(p(li,j=bg)) ).
 
-It should be maximize, not minimize. Plus, why isn't the loss function binary entropy?
-
 Two main drawbacks of this FCN without any recurrent:
 
 - no priors
