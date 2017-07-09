@@ -52,7 +52,7 @@ Output: image h * w * 2 (2 for Foreground and Background)
 
 In general, the formulas of one forward pass are constructed from two main processes of the system: Input => Conv layers => Deconv layers
 
-The paper uses a pretty weird loss function.
+The paper uses negative log-likelihood loss function.
 
 Loss = -( sum_all_over_pixels_in_all_over_images 1(Ci,j = fg)log(p(li,j=fg)) + 1(Ci,j = bg)log(p(li,j=bg)) ).
 
