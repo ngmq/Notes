@@ -55,10 +55,73 @@ Lịch sử luôn luôn thú vị. Các mốc chính của saliency detection l�
 
 Như vậy, trải qua 36 năm (1980-2017), nghiên cứu saliency đã trải qua nhiều thăng trầm. Điều đáng chú ý là theory ra đời từ những ngày đầu cho tới tận bây giờ vẫn còn nguyên giá trị, không có bất cứ nghiên cứu nào của neorosience chối bỏ nó. Mốc lịch sử tiếp theo của saliency sẽ phụ thuộc vào representation learning trong deep neural nets.
 
-# Mô hình Koch-Ullman
+# Các mô hình tính toán
 
-# Mô hình Itti-Koch
+Ba mô hình được đề cập trong slide: Koch-Ullman (lý thuyết chính), Itti-Koch (code, thêm phần top-down), VOCUS và VOCUS2 (cải tiến, lắp ráp thêm)
 
-# Mô hình VOCUS và VOCUS2
+## Mô hình Koch-Ullman
+Ngược dòng thời gian về năm 1985 để tìm hiểu xem Koch và Ullman (lúc đó 2 bác này đang làm ở MIT) đã đề xuất mô hình như thế nào để áp dụng Feature Integration theory. Paper: https://cseweb.ucsd.edu/classes/fa09/cse258a/papers/koch-ullman-1985.pdf.
+
+<Hình vẽ slide số 15>
+
+Bên cạnh feature integration, điểm đáng chú ý nữa trong mô hình kể trên là Winner-Take-All selection. WTA cố gắng giải bài toán *tìm phần tử lớn nhất với locally connected architecture*.
+
+<Hình vẽ slide số 73>
+
+**Bài toán: cho mảng a[], tìm vị trí của phần tử lớn nhất bằng mạng neuron locally connected kiểu pyramid, mỗi neuron chỉ lưu được 2 trạng thái 0 và 1. Độ phức tạp cần thiết là O(logn), vì mảng a thay đổi liên tục.**
+
+**Lời giải của WTA network**
+
+Dùng 2 mạng neuron: mạng màu vàng lưu trạng thái của a[i], mạng màu xanh lưu trạng thái của index i.
+
+Neuron màu vàng sẽ activated (trạng thái 1) nếu giá trị của nó lớn hơn giá trị của neuron connect với nó.
+
+Neuron màu xanh sẽ activated, nếu neuron vàng gắn với nó activated và neuron xanh ở trên nó activated.
+
+Dễ thấy là về cơ bản mỗi mạng xanh và vàng là một cây nhị phân cân bằng, độ phức tạp của forward pass tìm phần tử lớn nhất và backward pass tìm vị trí của phần tử đó đều bằng chiều cao cây, cho nên độ phức tạp sẽ là O(logn).
+
+WTA của Koch-Ullman đúng là rất đơn giản nhưng cũng rất thú vị. Về sau VOCUS model cũng làm WTA và có thay đổi một chút.
+
+Lưu ý là Koch-Ullman hồi ấy chỉ nêu thuật toán chứ không có code.
+
+## Mô hình Itti-Koch
+
+<Hình vẽ slide số 16>
+
+Là bản cài đặt của Koch-Ullman, ra đời mãi tận 13 năm sau (chắc cụ Koch mải chọn ngôn ngữ để cài đặt, điều thú vị là C++ cũng ra đời năm 1985). Trong model có cài đặt cụ thể central-surround contrast, intensity, orientation, colors...và có cả top-down attentional bias, đây chính là điểm mới so với Koch-Ullman là chưa có tín hiệu top-down. 
+
+## Mô hình Attention chung
+
+<Hình vẽ slide số 19>
+
+Gồm 7 bước chính, được rút ra từ Itti-Koch model:
+
+1. Tính các feature channels
+2. Scale representation
+3. **Center-surround contrast (most important!)**
+4. Fusion
+5. Maximum Finder
+6. Inhibition of Return
+7. Top-down influence
+
+## Mô hình VOCUS và VOCUS2
+
+Saliency systems: bước từ 1 tới 4 của attention system.
+
+Khác biệt với Itti: 
+
+- Bước số 1: dùng color space khác.
+- Bước số 2 và 3: nhiều scale hơn nhiều. Lý do có thể áp dụng nhiều scale là bởi vì VOCUS system trừ Gauss của hai pyramid khác nhau, còn Itti trừ Gauss của cùng một pyramid.
+- Bước số 4: fusion khác (e.g. uniqueness...)
+
+Khác biệt giữa VOCUS2 và VOCUS:
+
+VOCUS2 có thêm bước 3.5 là tính map cho orientation và motion. Thực ra VOCUS cũng có motion nhưng ko hiệu quả, làm giảm performance nên ko dc cho vào.
+
+### Cách tính center-surround contrast cho L, a, b
+### Cách tính motion
+### Cách làm trajectory inference
 
 # Evaluation
+
+Nội dung giống hệt như exercise. Dataset phổ biến là MSRA, MIT, PASCAL VOC,... Cách làm vẫn là generate ra saliency map rồi cho threshold chạy, sau đó tính Precision và Recall. Khi tính precision và recall thì "positive" data chính là salient pixel. Tất nhiên là tính cả F1, rồi thì AUC,...
