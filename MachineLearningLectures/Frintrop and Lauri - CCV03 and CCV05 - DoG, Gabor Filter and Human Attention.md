@@ -1,7 +1,57 @@
 Link Gabor Filter: CCV 03, mincommsy
 Link Human Attention: CCV 05, mincommsy
 
-# Gabor Filter
+# Difference of Gaussian, Gabor Filter và Orientation Pyramid
+
+## Difference of Gaussian
+
+Rất phổ biến, sinh ra không gì khác là để mô phỏng center-surround và surround-center On/Off nổi tiếng. 
+
+Có thể tính nhanh vì là seperable, do đó được ưa chuộng rộng rãi để xấp xỉ Laplacian filter.
+
+Điểm đáng chú ý là biểu thức toán học của DoG không nói gì tới màu sắc, cho nên DoG thuần túy chỉ có thể áp dụng cho ảnh Black-White contrast mà thôi. Muốn áp dụng DoG cho R-G và B-Y thì trước tiên phải convert ảnh sang hệ Lab trước, lúc này L đại diện cho B-W, a đại diện cho R-G và b đại diện cho B-Y.
+
+Lab là hệ màu perceptually uniform, có nghĩa là mắt người cảm nhận sự thay đổi tuyến tính: khoảng cách giữa 2 màu với nhau có ý nghĩa uniform trên toàn bộ hệ màu.
+
+## Gabor filter
+Cũng giống như các loại filter khác trong computer vision, khi tìm hiểu Gabor filter thì câu hỏi quan trọng nhất là: pattern gì? Mỗi loại filter sẽ có phản ứng với pattern nhất định. Câu hỏi tiếp theo là: biể thức toán học của pattern đấy là gì? Phải có biểu thức toán học thì mới có thể nghiên cứu được. Câu hỏi tiếp theo và cũng là cuối cùng: tính toán hoặc xấp xỉ biểu thức toán học đấy như thế nào? 
+
+### Pattern gì?
+
+Nếu như Difference of Gaussian (DoG) là để phát hiện pattern center-surround và surround-center kinh điển ("concentric receptive fileds") trong ganglion cells ở Retina, thì Gabor filter được phát triển là để phát hiện pattern về hướng (orientation) ("elongated receptive fields") như trong simple và hypercomplex cells ở V1. Cũng vì thế nên ta phải chuẩn bị cho một biểu thức toán học cũng "hypercomplex" thì mới đáp ứng được nhu cầu. 
+
+Xem hình vẽ ở slide số 28 (trang 23 pdf) để có hình dung về cách loại enlongated receptive fields mà Gabor filter có thể mô phỏng.
+
+### Biểu thức toán học gì?
+
+Slide số 31 cho ta đồ thị của cái filter mà ta mong muốn, và hình vẽ ở bên phải là hình chiếu của cái filter đó lên mặt phẳng Oxy (giả sử chiều cao lồi lên lồi xuống là trục Oz). Lưu ý là filter ta mong muốn có dạng: ...-lõm-lồi-lõm-lồi-lõm-... cứ lồi lõm đan xen nhau, càng ở giữa thì độ lệch lồi lõm càng lớn, khi đi ra tới rìa thì giảm dần và gần như là ko thay đổi. Các đoạn lồi lõm phải smooth (có đạo hàm liên tục) để tiện cho việc tính toán. Các nhà toán học đã tìm ra biểu thức cho hàm số như vậy là:
+
+Gabor(x) = Gauss(x) * Sinusoid(x)
+
+Trong đó hàm Sinusoid có thể là sin, cos hoặc tổng cos + i\*sin. Phép nhân ở trên là phép nhân đại số bình thường.
+
+Nếu lấy hàm sin thì ta sẽ được một hàm lẻ, vì sin(-x) = -sin(x). Ngược lại lấy hàm cos sẽ được hàm chẵn. Vì vậy mà thường thì chỉ dùng một trong 2 loại là đủ để mô phỏng loại pattern ta mong muốn. Nếu pattern đối xứng (symmetric) thì dùng hàm chẵn, ngược lại dùng hàm lẻ. Biểu thức toán học sẽ là:
+
+Gabor_odd(x) = [1/sqrt(2\*pi\*sigma^2) * exp{-x^2 / (2\*sigma^2)}] * [sin(2\*pi\*omega_0\*x)]
+Gabor_even(x) = [1/sqrt(2\*pi\*sigma^2) * exp{-x^2 / (2\*sigma^2)}] * [cos(2\*pi\*omega_0\*x)]
+
+Mở rộng sang 2D:
+
+Gabor_odd(x) = [1/(2\*pi\*sigma_x^2\*sigma_y^2) * exp{-x^2 / (2\*sigma_x^2) - y^2/ (2\*sigma_y^2)}] * [sin(2\*pi\*omega_x_0\*x + 2\*pi\*omega_y_0\*y)]
+
+Gabor_even(x) = [1/(2\*pi\*sigma_x^2\*sigma_y^2) * exp{-x^2 / (2\*sigma_x^2) - y^2/ (2\*sigma_y^2)}] * [cos(2\*pi\*omega_x_0\*x + 2\*pi\*omega_y_0\*y)]
+
+Nói chung khi đã viết dc cho 1D thì mở rộng sang 2D đơn giản. Lưu ý khi sang 2D thì phải là sin của tổng chứ không phải là tổng của sin, lý do là x, y thay đổi cùng nhau.
+
+Gabor filter là xấp xỉ linear, theo http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/TRAPP1/filter.html. 
+
+### Tính hoặc xấp xỉ thế nào?
+
+Gabor filter thường được tính trực tiếp và không cần xấp xỉ.
+
+## Orientation Pyramid
+
+Chính là kết quả giống như trong excercise: Gaussian pyramid => Laplacan pyramid => Orientation pyramid.
 
 # Human Attention
 
