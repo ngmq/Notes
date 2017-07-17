@@ -26,7 +26,11 @@ Page 14 wrote
 
 "Several research findings indicate that both, excitation and inhibition are important in human visual attention."
 
-# How VOCUS2 did visual search
+# How VOCUS did visual search
+
+In VOCUS, an explicit saliency map for top down cues is computed. Recall that the saliency map in previous lectures with Laplacian pyramids and stuff is the bottom up saliency map. Suppose that the top down map has been calculated, the final global saliency map is just a weighted average of the top down and bottom up map:
+
+Final_saliency_map = (1 - t) * BU_map + t * TD_map
 
 
 
