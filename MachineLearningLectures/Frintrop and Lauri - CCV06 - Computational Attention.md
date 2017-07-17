@@ -119,8 +119,25 @@ Khác biệt giữa VOCUS2 và VOCUS:
 VOCUS2 có thêm bước 3.5 là tính map cho orientation và motion. Thực ra VOCUS cũng có motion nhưng ko hiệu quả, làm giảm performance nên ko dc cho vào.
 
 ### Cách tính center-surround contrast cho L, a, b
+
+Xem lại note bài 3
+
 ### Cách tính motion
-### Cách làm trajectory inference
+
+Phần này ko có thời gian tìm hiểu, chỉ biết là mỗi pixel có một giá trị gọi là optical flow. Tính on-off cho map của optical flow này.
+
+### Trajectory inference
+
+2 cách làm: 1 là tìm max liên tục bằng WTA, 2 là sort hết sau khi vừa xử lý xong. Slide nói cách 1 với IoR sẽ quan trọng trong 3D, tới object discovery sẽ nói rõ (có thể là trong 3D thì số lượng maxima lớn quá đâm ra ko sort dc)
+
+### Size of FOA
+
+VOCUS2 dùng seeded region growing, khá là đơn giản: vì saliency là số thực, nên có thể tính 1 cái threshold, ví dụ như 25% của thằng maxima, rồi duyệt neighbors xem thằng nào lệch ít hơn 25% thì ghép vào FOA.
+
+### Normalization
+
+(x - xmin) / (xmax - xmin) = r = (y - ymin) / (ymax - ymin)
+=> y = (ymax - ymin)/(xmax - xmin) * x + ymin - xmin * (ymax - ymin) / (xmax - xmin)
 
 # Evaluation
 
