@@ -16,3 +16,4 @@ How we see the world really changes what we are.
 The thing is, how would one come up with such kind of perspective shift? What kind of practice would one need to go through, or how many problems one must solve in order to be good at it?
 
 Btw, the direction of inequality between r^{k}, r^{k+1} and r{k+2} in the book is incorrect. It should be r{k+2} + r{k+1} >= r^{k}.
+Check this: https://www.wolframalpha.com/input/?i=plot+x%5E2+%2B+x+-+1
