@@ -255,12 +255,12 @@ layer {
     }
   }
 }
-layer {
-  name: "sigmoid_final"
-  bottom: "final"
-  top: "final"
-  type: "Sigmoid"
-}
+#layer {
+#  name: "sigmoid_final"
+#  bottom: "final"
+#  top: "final"
+#  type: "Sigmoid"
+#}
 layer {
   name: "loss"
   type: "SigmoidCrossEntropyLoss"
