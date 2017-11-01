@@ -1,0 +1,284 @@
+name: "ELDNetObject"
+layer {
+    name: "lowlevel_db"
+    type: "Data"
+    top: "lowdata"
+    top: "label"
+    transform_param {
+	    mirror: false
+    } 
+    data_param {
+        source: "train_lowDB"
+        backend: LMDB
+        batch_size: 100
+    }
+}
+layer {
+  name: "highlevel_db"
+  type: "MemoryData"
+  top: "conv5_3"
+  top: "fakelabel"
+  transform_param {
+	mirror: false
+  }
+  memory_data_param {
+	batch_size: 100
+	channels: 512
+	height: 14
+	width: 14
+  }
+}
+layer {
+  name: "conv1_high"
+  type: "Convolution"
+  bottom: "conv5_3"
+  top: "conv1_high"
+  convolution_param {
+    num_output: 128
+    kernel_size: 1
+  }
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+}
+layer {
+  name: "relu1_high"
+  type: "ReLU"
+  bottom: "conv1_high"
+  top: "conv1_high"
+}
+layer {
+  name: "flatten2"
+  type: "Flatten"
+  bottom: "conv1_high"
+  top: "highfeatures"
+}
+
+layer {
+  name: "conv1_low"
+  type: "Convolution"
+  bottom: "lowdata"
+  top: "conv1_low"
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 64
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "relu1_low"
+  type: "ReLU"
+  bottom: "conv1_low"
+  top: "conv1_low"
+}
+layer {
+  name: "conv2_low"
+  type: "Convolution"
+  bottom: "conv1_low"
+  top: "conv2_low"
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 32
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "relu2_low"
+  type: "ReLU"
+  bottom: "conv2_low"
+  top: "conv2_low"
+}
+layer {
+  name: "conv3_low"
+  type: "Convolution"
+  bottom: "conv2_low"
+  top: "conv3_low"
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 3
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "flatten1"
+  type: "Flatten"
+  bottom: "conv3_low"
+  top: "lowfeatures"
+}
+
+layer {
+  name: "concat"
+  type: "Concat"
+  top: "concatfeatures"
+  bottom: "lowfeatures"
+  bottom: "highfeatures"
+  concat_param {
+	axis: 1
+  }
+}
+
+layer {
+  name: "fc1_1"
+  type: "InnerProduct"
+  bottom: "concatfeatures"
+  top: "fc1"
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 1024
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+  }
+}
+layer {
+  name: "relu_fc1"
+  type: "ReLU"
+  bottom: "fc1"
+  top: "fc1"
+}
+layer {
+  name: "drop_fc1"
+  type: "Dropout"
+  bottom: "fc1"
+  top: "fc1"
+  dropout_param {
+    dropout_ratio: 0.0
+  }
+}
+layer {
+  name: "fc2_1"
+  type: "InnerProduct"
+  bottom: "fc1"
+  top: "fc2"
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 1024
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+  }
+}
+layer {
+  name: "relu_fc2"
+  type: "ReLU"
+  bottom: "fc2"
+  top: "fc2"
+}
+layer {
+  name: "drop_fc2"
+  type: "Dropout"
+  bottom: "fc2"
+  top: "fc2"
+  dropout_param {
+    dropout_ratio: 0.0
+  }
+}
+
+layer {
+  name: "final"
+  type: "InnerProduct"
+  bottom: "fc2"
+  top: "final"
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "sigmoid_final"
+  bottom: "final"
+  top: "final"
+  type: "Sigmoid"
+}
+layer {
+  name: "loss"
+  type: "SigmoidCrossEntropyLoss"
+  bottom: "final"
+  bottom: "label"
+  top: "loss"
+  include{
+      phase: TRAIN
+  }
+}
+layer {
+  name: "loss2"
+  type: "EuclideanLoss"
+  bottom: "final"
+  bottom: "fakelabel"
+  top: "loss2"
+  loss_weight: 0
+  include{
+      phase: TRAIN
+  }
+}
