@@ -1,149 +1,195 @@
 import matplotlib.pyplot as plt
 import numpy as np
+np.random.seed(0)
+
 import imageio
-from skimage.color import rgb2gray
-import cv2
+import argparse
 
-trace = dict()
-
-def solve(binary_image, image_height, image_width, window_size, current_column, current_row):
-	# if current_column == 5:
-	#  	print("solving at: {}, {}".format(current_column, current_row))
+def visualization(im_binary, W, res):
+	plt.imshow(im_binary)
 	
-	if current_column >= image_width:
-		trace[(current_column, current_row)] = (-1, -1, 0)
-		
-		return 0
-	if current_row >= image_height:
-		ret = solve(binary_image, image_height, image_width, window_size, current_column + 1, 0)
-		trace[(current_column, current_row)] = trace[(current_column + 1, 0)]
-		
-		return ret
-	# if (current_column, current_row) in trace:
-	#  	return trace[(current_column, current_row)][2]
+	n = res[0]
+	M, N = im_binary.shape
 
-	ret = image_height * image_width # abitrary large number
-	ret_top_left = -1 # the row of the top left position of the window
+	for i in range(1, n+1):
+		row, col = res[i]
 
-	has_1 = False
-	for row in range(current_row, image_height):
-		if binary_image[row][current_column] == 1:
-			has_1 = True
-			for top_left in range(row - window_size + 1, row+1):
-				if top_left >= 0 and top_left < image_height:
-					right_border = current_column + window_size
-					if right_border > image_width:
-						right_border = image_width
-					n1 = 0
-					for j in range(current_column, right_border):
-						n1 += binary_image[top_left][j]
-					if n1 == 0:
-						continue
-					### Putting a window here
-					# print("current_column = {}, found 1 at row = {}, putting a top_left at {}".format(current_column, row, top_left))
-					### Step 1: mark every 1 in this window to 0
-					### Step 2: solve the corresponding sub-problem
-					### Step 3: recover the 1s after that
-					ret_tmp = 0
-					list_one = list()
+		x1 = col-0.5
+		y1 = row-0.5
+		x2 = min(col + W - 1, N-1)+0.5
+		y2 = min(row + W - 1, M-1)+0.5
+		plt.plot((x1, x2), (y1, y1), 'r-')
+		plt.plot((x1, x2), (y2, y2), 'r-')
+		plt.plot((x1, x1), (y1, y2), 'r-')
+		plt.plot((x2, x2), (y1, y2), 'r-')
 
-					### Step 1
-					for i in range(top_left, top_left + window_size):
-						for j in range(current_column, current_column + window_size):
-							if i >= 0 and i < image_height and j >= 0 and j < image_width and binary_image[i][j] == 1:
-								list_one.append((i,j))
-								binary_image[i][j] = 0
-					### Step 2
-					ret_tmp = 1 + solve(binary_image, image_height, image_width, window_size, current_column, top_left + window_size)
-					if ret_tmp <= ret:
-						ret = ret_tmp
-						ret_top_left = top_left
+	plt.show()
 
-					### Step 3
-					for (i, j) in list_one:
-					 	binary_image[i][j] = 1
-
-			break
-
-	if ret_top_left == -1:
-		if has_1 is True:
-			ret = -np.inf
-			print("SOMETHING WRONG! current_column = {}, current_row = {}".format(current_column, current_row))
+def solve(Ones, inList, W, maxP):
+	if maxP < 1:
+		if np.count_nonzero(inList) > 0:
+			return [-1]
 		else:
-			assert(has_1 is False)
-			# print("solving at: {}, {}, moving to next column".format(current_column, current_row))
-			ret = solve(binary_image, image_height, image_width, window_size, current_column + 1, 0)
-			trace[(current_column, current_row)] = trace[(current_column + 1, 0)]
+			return [0]
+	if np.count_nonzero(inList) == 0:
+		return [0]
+
+	### Find the bounding box
+	row_min = -1
+	row_max = -1
+	col_min = -1
+	col_max = -1
+	N = len(Ones)
+	for i in range(N):
+		### Only consider points that have not been covered yet
+		if inList[i] == 0:
+			continue
+
+		x, y = Ones[i]
+		if row_min == -1 or row_min > x:
+			row_min = x
+		if row_max == -1 or row_max < x:
+			row_max = x
+		
+		if col_min == -1 or col_min > y:
+			col_min = y
+		if col_max == -1 or col_max < y:
+			col_max = y
+
+	### Always return the co-ordinate of the top-left corner of the squares
+	### Base case: maxP = 1.
+	if maxP == 1:
+		if row_max - row_min + 1 <= W and col_max - col_min + 1 <= W:
+			return [1, (row_min, col_min)]
+		else:
+			return [-1]
+	
+	### All 4 corners
+	tries = []
+	## corners = [(row_min, col_min), (row_min, col_max), (row_max, col_min), (row_max, col_max)]
+	
+	if maxP <= 3:
+		tries.append((row_min, col_min))
+		if col_max - W + 1 > col_min:
+			tries.append((row_min, col_max - W + 1))
+		if row_max - W + 1 > row_min:
+			tries.append((row_max - W + 1, col_min))
+		if col_max - W + 1 > col_min and row_max - W + 1 > row_min:
+			tries.append((row_max - W + 1, col_max - W + 1))
 	else:
-		# print("solving at: {}, {}, moved to row {}, result here = {}".format(current_column, current_row, ret_top_left + window_size, ret))
-		trace[(current_column, current_row)] = (ret_top_left, current_column, ret)
+		for r in range(row_min, max(row_min, row_max - W + 1) + 1):
+			tries.append((r, col_min))
 
-	return ret
+	save = list(inList)
+	res_n = -1
+	res = []
+	sub_res = []
+	sub_res_idx = -1
+
+	idx = 0
+	for r, c in tries:
+		### Remove the points that will be covered by this square
+		# print("r, c = {}, {}".format(r, c))
+
+		for i in range(N):
+			if inList[i] == 0:
+				continue
+
+			x, y = Ones[i]
+			if x >= r and x - r + 1 <= W and y >= c and y - c + 1 <= W:
+				inList[i] = 0
+
+		### Solve next
+		tmp = solve(Ones, inList, W, maxP - 1)
+		if tmp[0] != -1:
+			if res_n == -1 or res_n > tmp[0] + 1:
+				res_n = tmp[0] + 1
+				sub_res = tmp
+				sub_res_idx = idx
+
+		idx += 1
+		### Recover the inList
+		inList = list(save)
+
+		# print("after idx = {}, res_n is {}".format(idx-1, res_n))
+
+	if res_n == -1:
+		return [-1]
+	else:
+		res.append(res_n)
+		res.append(tries[sub_res_idx])
+
+		if res_n > 1:
+			res.extend(sub_res[1:])
+		
+		return res
 
 
-window_size = 24
-threshold = 50
+if __name__ == "__main__":
 
-im_original = imageio.imread('MultiGradient2.png')
+	parser = argparse.ArgumentParser(description="Read image and generate covering squares")
+	parser.add_argument("-i", "--image", type=str, nargs='?', help="image file")
+	parser.add_argument("-t", "--threshold", type=float, nargs='?', help="threshold in percent of the maximum intensity")
+	parser.add_argument("-m", "--maxP", type=int, nargs='?', help="maximum number of squares")
+	parser.add_argument("-w", "--W", type=int, nargs='?', help="square size")
 
+	### Reading arguments
+	args = parser.parse_args()
 
-print(im_original.shape, np.min(im_original), np.max(im_original))
+	if args.image is None:
+		raise Exception("The image file is unspecified")
 
-# print(im_original)
+	if args.threshold is not None:
+		threshold = args.threshold
+	else:
+		threshold = 25
 
-im_binary = np.where(im_original > threshold, 1, 0)
+	if args.maxP is not None:
+		maxP = args.maxP
+	else:
+		maxP = 4
 
-# SIZE = 50
-# im_binary = np.random.randint(low=0, high=2, size=(SIZE, SIZE))
-# print(im_binary.dtype, im_binary.shape, np.min(im_binary), np.max(im_binary))
+	if args.W is not None:
+		W = args.W
+	else:
+		W = 24
 
-H, W = im_binary.shape
+	### Reading the original image
+	im_original = imageio.imread(args.image)
 
-plt.imshow(im_binary)
-plt.show()
+	print(im_original.shape, np.min(im_original), np.max(im_original))
 
-print(im_binary.shape, np.min(im_binary), np.max(im_binary))
-save_im_binary = im_binary.copy()
+	### Thresholding to obtain the binary image
 
-# for i in range(W):
-# 	for j in range(H):
-# 		if im_binary[j][i] == 1:
-# 			print("(col, row) = ({}, {})".format(i, j))
+	intensity_threshold = np.max(im_original) * threshold / 100.0
 
-# res_top_left = list()
-result = solve(im_binary, H, W, window_size, 0, 0)
-print("result = {}".format(result))
+	im_binary = np.where(im_original >= intensity_threshold, 1, 0)
+	print(im_binary.shape, np.min(im_binary), np.max(im_binary))
 
-### sanity check
-assert(np.array_equal(save_im_binary, im_binary))
-top_left = trace[(0, 0)]
+	### im_binary = np.random.randint(0, 2, im_binary.shape) ### Test on random binary images
 
-plt.imshow(save_im_binary)
+	### Finding the covering squares or Outputing "Infeasible"
 
-for it in range(result):
-	row, col, ret = top_left
-	print("top_left of window is row = {}, col = {}".format(row, col))
-	for r in range(row, row + window_size):
-		for c in range(col, col + window_size):
-			if r >= 0 and r < H and c >= 0 and c < W:
-				im_binary[r][c] = 0
+	M, N = im_binary.shape
 
-	x1 = col-0.5
-	y1 = row-0.5
-	x2 = min(col + window_size - 1, W-1)+0.5
-	y2 = min(row + window_size - 1, H-1)+0.5
-	plt.plot((x1, x2), (y1, y1), 'r-')
-	plt.plot((x1, x2), (y2, y2), 'r-')
-	plt.plot((x1, x1), (y1, y2), 'r-')
-	plt.plot((x2, x2), (y1, y2), 'r-')
+	plt.imshow(im_binary)
+	plt.show()
 
-	next_col = col
- 	next_row = row + window_size
- 	if it < result - 1:
- 		top_left = trace[(next_col, next_row)]
+	Ones = []
+	for i in range(M):
+		for j in range(N):
+			if im_binary[i][j] == 1:
+				Ones.append((i,j))
 
-print("count nonzero = {}".format(np.count_nonzero(im_binary)))
-plt.show()
+	res = solve(Ones, [1] * len(Ones), W, maxP)
+	if res[0] == -1:
+		print("Cannot cover all bright pixels with {} squares".format(maxP))
+	else:
+		print("Number of squares needed = {}".format(res[0]))
+		print("Positions of the squares:")
+		for i in range(1, res[0]+1):
+			print("(row, col) = {}".format(res[i]))	
 
-# print("res_top_left = {}".format(res_top_left))
+		print("Visualization:")
+		visualization(im_binary, W, res)
 
