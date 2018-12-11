@@ -25,7 +25,7 @@ def visualization(im_binary, W, res):
 
 	plt.show()
 
-def solve(Ones, inList, W, maxP):
+def solve(Ones, inList, W, maxP, firstCall = False):
 	if maxP < 1:
 		if np.count_nonzero(inList) > 0:
 			return [-1]
@@ -100,6 +100,8 @@ def solve(Ones, inList, W, maxP):
 				inList[i] = 0
 
 		### Solve next
+		if firstCall == True and res_n != -1:
+			maxP = res_n
 		tmp = solve(Ones, inList, W, maxP - 1)
 		if tmp[0] != -1:
 			if res_n == -1 or res_n > tmp[0] + 1:
@@ -181,7 +183,7 @@ if __name__ == "__main__":
 			if im_binary[i][j] == 1:
 				Ones.append((i,j))
 
-	res = solve(Ones, [1] * len(Ones), W, maxP)
+	res = solve(Ones, [1] * len(Ones), W, maxP, True)
 	if res[0] == -1:
 		print("Cannot cover all bright pixels with {} squares".format(maxP))
 	else:
